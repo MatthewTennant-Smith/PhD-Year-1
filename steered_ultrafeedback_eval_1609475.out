@@ -1,0 +1,379 @@
+=========================================================
+Steered UltraFeedback Evaluation
+=========================================================
+Job ID    : 1609475
+Node      : compute-2
+GPU(s)    : 2
+Started   : Fri  9 Oct 00:16:39 BST 2026
+=========================================================
+
+Generation model    : /home/xrai/models/Llama-3.1-8B-Instruct
+Judge model         : /home/xrai/models/flowjudge
+Eval dataset        : /home/xrai/datasets/ultrafeedback/ultrafeedback_test.json
+Fit dataset         : /home/xrai/datasets/ultrafeedback/ultrafeedback_train.json
+Steer attributes    : helpfulness honesty
+Steer layer         : 15
+CAA multiplier      : 0.8
+MAT-Steer steps     : 100
+Pairing strategy    : extremes
+Positive threshold  : 3
+Pairing min margin  : 1
+Output              : /home/y2y33/projects/multi_eval/LLM/data/evaluation_results
+
+GPU Information
+NVIDIA L40, 46068 MiB, 595.71.05
+NVIDIA L40, 46068 MiB, 595.71.05
+NVIDIA L40, 46068 MiB, 595.71.05
+NVIDIA L40, 46068 MiB, 595.71.05
+
+Pre-flight checks passed.
+
+=========================================================
+Starting Steered Evaluation
+=========================================================
+============================================================
+UltraFeedback Steering Comparison: Baseline vs CAA vs MAT-Steer
+============================================================
+Using device: cuda
+============================================================
+Loading UltraFeedback dataset
+============================================================
+Loading: /home/xrai/datasets/ultrafeedback/ultrafeedback_test.json
+Loaded 240 examples.
+Total reference completions across all examples: 960
+============================================================
+Loading UltraFeedback dataset
+============================================================
+Loading: /home/xrai/datasets/ultrafeedback/ultrafeedback_train.json
+Loaded 960 examples.
+Total reference completions across all examples: 3840
+Using separate fit/eval files: 960 instructions (3840 flattened reference completions) from --fit-dataset-path for fitting steering vectors, 240 instructions from --dataset-path (used in full, no internal split) for evaluation.
+============================================================
+Loading generation model
+============================================================
+/home/xrai/models/Llama-3.1-8B-Instruct
+############################################################
+Generating: baseline
+############################################################
+============================================================
+Generating Responses
+============================================================
+Batch 10/60 completed (77.0s)
+Batch 20/60 completed (154.9s)
+Batch 30/60 completed (231.8s)
+Batch 40/60 completed (311.1s)
+Batch 50/60 completed (389.5s)
+Batch 60/60 completed (465.1s)
+
+Generation completed in 465.13s
+============================================================
+Building CAA steering vector
+============================================================
+[helpfulness] 938 positive / 938 negative fitting examples
+[honesty] 885 positive / 885 negative fitting examples
+CAA vector built in 241.82s
+Saved CAA vector to /home/y2y33/projects/multi_eval/LLM/data/evaluation_results/caa_vector_20261009_001646.pt
+############################################################
+Generating: caa
+############################################################
+============================================================
+Generating Responses
+============================================================
+Batch 10/60 completed (76.7s)
+Batch 20/60 completed (154.7s)
+Batch 30/60 completed (231.5s)
+Batch 40/60 completed (310.9s)
+Batch 50/60 completed (389.3s)
+Batch 60/60 completed (464.9s)
+
+Generation completed in 464.88s
+============================================================
+Collecting activations for MAT-Steer (self_attn.o_proj input)
+============================================================
+[helpfulness] 938 positive / 938 negative fitting examples
+[honesty] 885 positive / 885 negative fitting examples
+============================================================
+Training MAT-Steer gates + steering vectors
+============================================================
+step    0/100 | total=1.3357 mmd=0.0052 pos=0.4872 sparse=0.9879 ortho=1.5032
+step   10/100 | total=0.7412 mmd=0.0052 pos=0.2410 sparse=0.6599 ortho=0.1531
+step   20/100 | total=0.4564 mmd=0.0053 pos=0.1319 sparse=0.4319 ortho=0.0003
+step   30/100 | total=0.3166 mmd=0.0053 pos=0.0857 sparse=0.3011 ortho=0.0178
+step   40/100 | total=0.2366 mmd=0.0054 pos=0.0619 sparse=0.2266 ortho=0.0044
+step   50/100 | total=0.1880 mmd=0.0055 pos=0.0472 sparse=0.1809 ortho=0.0001
+step   60/100 | total=0.1558 mmd=0.0055 pos=0.0373 sparse=0.1505 ortho=0.0009
+step   70/100 | total=0.1326 mmd=0.0055 pos=0.0302 sparse=0.1286 ortho=0.0002
+step   80/100 | total=0.1152 mmd=0.0055 pos=0.0250 sparse=0.1121 ortho=0.0000
+step   90/100 | total=0.1017 mmd=0.0055 pos=0.0211 sparse=0.0991 ortho=0.0000
+step   99/100 | total=0.0918 mmd=0.0056 pos=0.0183 sparse=0.0895 ortho=0.0000
+MAT-Steer training completed in 0.65s
+Saved MAT-Steer module to /home/y2y33/projects/multi_eval/LLM/data/evaluation_results/mat_steer_20261009_001646.pt
+############################################################
+Generating: mat_steer
+############################################################
+============================================================
+Generating Responses
+============================================================
+Batch 10/60 completed (76.8s)
+Batch 20/60 completed (154.9s)
+Batch 30/60 completed (231.8s)
+Batch 40/60 completed (311.3s)
+Batch 50/60 completed (389.8s)
+Batch 60/60 completed (465.5s)
+
+Generation completed in 465.47s
+============================================================
+Loading judge model
+============================================================
+/home/xrai/models/flowjudge
+############################################################
+Judging: baseline
+############################################################
+============================================================
+Running LLM-as-a-Judge (pairwise, vs all references)
+============================================================
+Judged batch 10/240 (4.1s)
+Judged batch 20/240 (8.8s)
+Judged batch 30/240 (12.2s)
+Judged batch 40/240 (15.9s)
+Judged batch 50/240 (19.8s)
+Judged batch 60/240 (24.2s)
+Judged batch 70/240 (28.4s)
+Judged batch 80/240 (31.8s)
+Judged batch 90/240 (35.7s)
+Judged batch 100/240 (39.8s)
+Judged batch 110/240 (43.4s)
+Judged batch 120/240 (47.4s)
+Judged batch 130/240 (51.7s)
+Judged batch 140/240 (55.4s)
+Judged batch 150/240 (59.1s)
+Judged batch 160/240 (62.7s)
+Judged batch 170/240 (66.5s)
+Judged batch 180/240 (70.8s)
+Judged batch 190/240 (75.0s)
+Judged batch 200/240 (79.7s)
+Judged batch 210/240 (84.0s)
+Judged batch 220/240 (88.0s)
+Judged batch 230/240 (91.9s)
+Judged batch 240/240 (95.8s)
+
+Judging completed in 95.77s
+============================================================
+Judge Results
+============================================================
+LLM-judge win rate (across all candidate-vs-reference comparisons): 35.42%
+============================================================
+Win Rate by Reference Model
+============================================================
+alpaca-7b               : 53.85% (28/52)
+bard                    : 41.86% (18/43)
+falcon-40b-instruct     : 39.71% (27/68)
+gpt-3.5-turbo           : 40.62% (26/64)
+gpt-4                   : 23.64% (13/55)
+llama-2-13b-chat        : 39.13% (27/69)
+llama-2-70b-chat        : 22.54% (16/71)
+llama-2-7b-chat         : 28.12% (18/64)
+mpt-30b-chat            : 42.65% (29/68)
+pythia-12b              : 0.00% (0/1)
+starchat                : 42.37% (25/59)
+ultralm-13b             : 25.58% (11/43)
+ultralm-65b             : 31.25% (20/64)
+vicuna-33b              : 33.33% (20/60)
+wizardlm-13b            : 26.23% (16/61)
+wizardlm-70b            : 39.06% (25/64)
+wizardlm-7b             : 38.89% (21/54)
+============================================================
+Running LLM-as-a-Judge (weighted attribute scoring)
+============================================================
+Scored batch 10/60 (12.8s)
+Scored batch 20/60 (26.3s)
+Scored batch 30/60 (39.2s)
+Scored batch 40/60 (53.1s)
+Scored batch 50/60 (66.7s)
+Scored batch 60/60 (79.2s)
+
+Scoring completed in 79.18s
+
+13 example(s) had no parseable attribute scores on the first attempt -- retrying with a stricter prompt.
+Retry completed in 6.08s -- recovered 6/13 example(s) (7 still unparseable).
+============================================================
+Weighted Attribute Score Results
+============================================================
+helpfulness             : 2.15 (unparsed: 7)
+honesty                 : 2.19 (unparsed: 9)
+instruction_following   : 2.13 (unparsed: 11)
+truthfulness            : 2.12 (unparsed: 10)
+############################################################
+Judging: caa
+############################################################
+============================================================
+Running LLM-as-a-Judge (pairwise, vs all references)
+============================================================
+Judged batch 10/240 (4.0s)
+Judged batch 20/240 (8.7s)
+Judged batch 30/240 (12.2s)
+Judged batch 40/240 (15.9s)
+Judged batch 50/240 (19.8s)
+Judged batch 60/240 (24.4s)
+Judged batch 70/240 (28.4s)
+Judged batch 80/240 (31.7s)
+Judged batch 90/240 (35.5s)
+Judged batch 100/240 (39.3s)
+Judged batch 110/240 (42.9s)
+Judged batch 120/240 (47.1s)
+Judged batch 130/240 (51.5s)
+Judged batch 140/240 (55.2s)
+Judged batch 150/240 (59.0s)
+Judged batch 160/240 (62.7s)
+Judged batch 170/240 (66.1s)
+Judged batch 180/240 (70.5s)
+Judged batch 190/240 (74.9s)
+Judged batch 200/240 (79.4s)
+Judged batch 210/240 (83.3s)
+Judged batch 220/240 (87.1s)
+Judged batch 230/240 (91.1s)
+Judged batch 240/240 (95.1s)
+
+Judging completed in 95.07s
+============================================================
+Judge Results
+============================================================
+LLM-judge win rate (across all candidate-vs-reference comparisons): 39.58%
+============================================================
+Win Rate by Reference Model
+============================================================
+alpaca-7b               : 51.92% (27/52)
+bard                    : 34.88% (15/43)
+falcon-40b-instruct     : 44.12% (30/68)
+gpt-3.5-turbo           : 46.88% (30/64)
+gpt-4                   : 27.27% (15/55)
+llama-2-13b-chat        : 43.48% (30/69)
+llama-2-70b-chat        : 21.13% (15/71)
+llama-2-7b-chat         : 39.06% (25/64)
+mpt-30b-chat            : 42.65% (29/68)
+pythia-12b              : 100.00% (1/1)
+starchat                : 42.37% (25/59)
+ultralm-13b             : 39.53% (17/43)
+ultralm-65b             : 45.31% (29/64)
+vicuna-33b              : 33.33% (20/60)
+wizardlm-13b            : 36.07% (22/61)
+wizardlm-70b            : 35.94% (23/64)
+wizardlm-7b             : 50.00% (27/54)
+============================================================
+Running LLM-as-a-Judge (weighted attribute scoring)
+============================================================
+Scored batch 10/60 (12.8s)
+Scored batch 20/60 (26.7s)
+Scored batch 30/60 (39.2s)
+Scored batch 40/60 (53.4s)
+Scored batch 50/60 (67.2s)
+Scored batch 60/60 (80.0s)
+
+Scoring completed in 80.01s
+
+15 example(s) had no parseable attribute scores on the first attempt -- retrying with a stricter prompt.
+Retry completed in 6.37s -- recovered 6/15 example(s) (9 still unparseable).
+============================================================
+Weighted Attribute Score Results
+============================================================
+helpfulness             : 2.22 (unparsed: 10)
+honesty                 : 2.25 (unparsed: 12)
+instruction_following   : 2.20 (unparsed: 13)
+truthfulness            : 2.20 (unparsed: 12)
+############################################################
+Judging: mat_steer
+############################################################
+============================================================
+Running LLM-as-a-Judge (pairwise, vs all references)
+============================================================
+Judged batch 10/240 (3.9s)
+Judged batch 20/240 (8.6s)
+Judged batch 30/240 (11.8s)
+Judged batch 40/240 (15.7s)
+Judged batch 50/240 (19.5s)
+Judged batch 60/240 (24.0s)
+Judged batch 70/240 (28.4s)
+Judged batch 80/240 (31.4s)
+Judged batch 90/240 (35.3s)
+Judged batch 100/240 (39.2s)
+Judged batch 110/240 (42.8s)
+Judged batch 120/240 (47.0s)
+Judged batch 130/240 (51.4s)
+Judged batch 140/240 (55.1s)
+Judged batch 150/240 (58.8s)
+Judged batch 160/240 (62.4s)
+Judged batch 170/240 (66.3s)
+Judged batch 180/240 (70.6s)
+Judged batch 190/240 (74.8s)
+Judged batch 200/240 (79.4s)
+Judged batch 210/240 (83.8s)
+Judged batch 220/240 (87.9s)
+Judged batch 230/240 (91.6s)
+Judged batch 240/240 (95.6s)
+
+Judging completed in 95.61s
+============================================================
+Judge Results
+============================================================
+LLM-judge win rate (across all candidate-vs-reference comparisons): 33.44%
+============================================================
+Win Rate by Reference Model
+============================================================
+alpaca-7b               : 51.92% (27/52)
+bard                    : 34.88% (15/43)
+falcon-40b-instruct     : 36.76% (25/68)
+gpt-3.5-turbo           : 32.81% (21/64)
+gpt-4                   : 30.91% (17/55)
+llama-2-13b-chat        : 34.78% (24/69)
+llama-2-70b-chat        : 21.13% (15/71)
+llama-2-7b-chat         : 29.69% (19/64)
+mpt-30b-chat            : 41.18% (28/68)
+pythia-12b              : 100.00% (1/1)
+starchat                : 38.98% (23/59)
+ultralm-13b             : 27.91% (12/43)
+ultralm-65b             : 26.56% (17/64)
+vicuna-33b              : 31.67% (19/60)
+wizardlm-13b            : 26.23% (16/61)
+wizardlm-70b            : 31.25% (20/64)
+wizardlm-7b             : 40.74% (22/54)
+============================================================
+Running LLM-as-a-Judge (weighted attribute scoring)
+============================================================
+Scored batch 10/60 (12.7s)
+Scored batch 20/60 (26.2s)
+Scored batch 30/60 (38.8s)
+Scored batch 40/60 (52.4s)
+Scored batch 50/60 (66.4s)
+Scored batch 60/60 (78.7s)
+
+Scoring completed in 78.69s
+
+13 example(s) had no parseable attribute scores on the first attempt -- retrying with a stricter prompt.
+Retry completed in 6.08s -- recovered 5/13 example(s) (8 still unparseable).
+============================================================
+Weighted Attribute Score Results
+============================================================
+helpfulness             : 2.08 (unparsed: 9)
+honesty                 : 2.12 (unparsed: 10)
+instruction_following   : 2.05 (unparsed: 12)
+truthfulness            : 2.03 (unparsed: 10)
+============================================================
+Comparison Summary
+============================================================
+variant       win_rate   help   hone   inst   trut    gen_s
+baseline        35.42%   2.15   2.19   2.13   2.12   465.13
+caa             39.58%   2.22   2.25   2.20   2.20   464.88
+mat_steer       33.44%   2.08   2.12   2.05   2.03   465.47
+============================================================
+Evaluation Finished
+============================================================
+Results saved to: /home/y2y33/projects/multi_eval/LLM/data/evaluation_results/steering_eval_ultrafeedback_20261009_001646.json
+
+=========================================================
+Finished
+Exit code : 0
+Finished  : Fri  9 Oct 00:57:17 BST 2026
+=========================================================
+
+Latest results:
+/home/y2y33/projects/multi_eval/LLM/data/evaluation_results/steering_eval_ultrafeedback_20261009_001646.json
