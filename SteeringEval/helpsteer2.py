@@ -1,4 +1,4 @@
-
+"""
 python helpsteer2.py \
     --generation-model /home/xrai/models/Meta-Llama-3.1-8B-Instruct \
     --judge-model /home/xrai/models/flowjudge \
