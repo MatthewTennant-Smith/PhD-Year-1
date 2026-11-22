@@ -1,26 +1,4 @@
 """
-LLM/evaluate.py -- Evaluate a model on hh-rlhf-style pairwise preference
-data using preference pair win rate.
-
-This script:
-
-1. Loads a locally downloaded JSON/JSONL file where every example has
-   "prompt", "preferred" and "rejected" fields (the format used by the
-   hh-rlhf dataset in this project).
-2. Loads a locally downloaded generation model. This model plays the
-   role of the judge: for every example it is shown the prompt plus the
-   two candidate responses (with the preferred/rejected side randomised
-   per example to remove position bias) and asked to pick the better one.
-3. The model gets a score of 1 if it selects the response that was
-   actually the "preferred" one, and 0 otherwise.
-4. The preference win rate is the average of these scores across the
-   dataset.
-5. Saves all results (win rate + per-example detail) as JSON.
-
-Designed for use with evaluate-job.slurm.
-
-Example:
-
 python evaluate.py \
     --generation-model /home/xrai/models/Qwen3-32B \
     --dataset-path /home/xrai/datasets/hh_rlhf_pairs.jsonl
