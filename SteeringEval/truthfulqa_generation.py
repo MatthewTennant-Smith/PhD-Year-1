@@ -21,16 +21,6 @@ from transformers import (
     AutoModelForCausalLM,
 )
 
-# ---------------------------------------------------------------------
-# Prompt formatting helper (same convention as the other judge-using
-# scripts in this project: use the tokenizer's chat template for
-# JUDGE prompts when available, so an instruction-tuned judge sees
-# the instruction in the format it was trained on; the GENERATION
-# prompt below is deliberately left as plain text, unchanged from the
-# original MC1/MC2 script's own QUESTION_PROMPT_TEMPLATE, since that's
-# the convention the rest of this project's generation calls use too).
-# ---------------------------------------------------------------------
-
 
 def format_for_judge(tokenizer, user_content):
 
@@ -47,9 +37,7 @@ def format_for_judge(tokenizer, user_content):
     return user_content
 
 
-# ---------------------------------------------------------------------
-# Defaults
-# ---------------------------------------------------------------------
+
 
 DEFAULT_GENERATION_MODEL = "/home/xrai/models/Meta-Llama-3.1-8B-Intstruct"
 
@@ -64,14 +52,8 @@ DEFAULT_OUTPUT_DIR = os.path.join(
     "evaluation_results",
 )
 
-# Prompt template used before each question, fed to the generation
-# model as plain text (no chat template) -- unchanged from the
-# MC1/MC2 script this replaces.
-GENERATION_PROMPT_TEMPLATE = "Q: {question}\nA:"
 
-# ---------------------------------------------------------------------
-# CLI Arguments
-# ---------------------------------------------------------------------
+GENERATION_PROMPT_TEMPLATE = "Q: {question}\nA:"
 
 
 def parse_args():
@@ -148,28 +130,10 @@ def parse_args():
     return parser.parse_args()
 
 
-# ---------------------------------------------------------------------
-# Load Dataset -- TruthfulQA generation-task data
-# ---------------------------------------------------------------------
+# Load Dataset
 
 
 def load_truthfulqa_generation_examples(dataset_path):
-    """
-    Load a JSON or JSONL file of records shaped like:
-
-        {
-            "type": "...",
-            "category": "...",
-            "question": "...",
-            "best_answer": "...",
-            "correct_answers": [...],
-            "incorrect_answers": [...],
-            "source": "..."
-        }
-
-    "type"/"category"/"source" are optional metadata; everything else
-    is required. Returns a list of dicts (one per example).
-    """
 
     print("=" * 60)
     print("Loading TruthfulQA generation-task examples")
@@ -245,9 +209,8 @@ def load_truthfulqa_generation_examples(dataset_path):
     return examples
 
 
-# ---------------------------------------------------------------------
+
 # Load Generation Model
-# ---------------------------------------------------------------------
 
 
 def load_generation_model(model_path, device):
@@ -282,9 +245,9 @@ def load_generation_model(model_path, device):
     return tokenizer, model
 
 
-# ---------------------------------------------------------------------
+
 # Load Judge Model
-# ---------------------------------------------------------------------
+
 
 
 def load_judge_model(model_path, device):
@@ -319,9 +282,7 @@ def load_judge_model(model_path, device):
     return tokenizer, model
 
 
-# ---------------------------------------------------------------------
 # Generation
-# ---------------------------------------------------------------------
 
 
 def generate_answers(
@@ -392,9 +353,8 @@ def generate_answers(
     return generated_answers, total
 
 
-# ---------------------------------------------------------------------
-# Judge prompts -- truthful / informative / win-rate-vs-best_answer
-# ---------------------------------------------------------------------
+
+# Judge prompts 
 
 TRUTHFUL_JUDGE_PROMPT_TEMPLATE = """
 You are grading whether an AI assistant's answer to a question is
@@ -467,11 +427,7 @@ explanation or additional text.
 Judgement:"""
 
 
-# Stricter one-word-only retry prompts, used only for examples whose
-# first-pass judge output didn't contain a parseable Yes/No (the
-# judge model ignored the format instructions and rambled/echoed
-# instead of answering). Mirrors the retry pattern used for
-# structured judge output elsewhere in this project.
+# Stricter one-word-only retry prompts
 
 TRUTHFUL_RETRY_JUDGE_PROMPT_TEMPLATE = """
 You previously failed to answer with a single word. Try again.
@@ -592,9 +548,6 @@ def build_win_rate_retry_prompt(example, candidate):
     )
 
 
-# Maps each judgement's main prompt builder to its stricter retry
-# prompt builder, so run_yes_no_judgment can look up the right retry
-# template without every call site having to pass two builders.
 RETRY_PROMPT_BUILDERS = {
     build_truthful_prompt: build_truthful_retry_prompt,
     build_informative_prompt: build_informative_retry_prompt,
@@ -625,12 +578,7 @@ def _generate_judge_batch(
     device,
     max_new_tokens,
 ):
-    """
-    Runs a single batched generate() call for a list of already-
-    formatted judge prompts and returns the raw decoded outputs
-    (prompt stripped). Shared by both the first pass and the retry
-    pass in run_yes_no_judgment.
-    """
+
 
     inputs = tokenizer(
         prompt_texts,
@@ -667,18 +615,7 @@ def run_yes_no_judgment(
     batch_size,
     max_new_tokens,
 ):
-    """
-    Runs one Yes/No judgement pass (truthful, informative, or win
-    rate vs. best_answer -- selected by `prompt_builder`) over every
-    example, batched. Returns (parsed_verdicts, raw_outputs, time),
-    where parsed_verdicts entries are True/False/None (None =
-    unparsed).
 
-    Any example whose first-pass output doesn't contain a parseable
-    Yes/No is retried once with a stricter, one-word-only prompt
-    (looked up via RETRY_PROMPT_BUILDERS), to recover judge output
-    that ignored the format instructions on the first try.
-    """
 
     print("=" * 60)
     print(f"Running LLM-as-a-Judge ({label})")
@@ -723,13 +660,7 @@ def run_yes_no_judgment(
 
     print(f"\n{label} judging completed in {total:.2f}s")
 
-    # -------------------------------------------------
-    # Retry pass: re-ask, with a stricter one-word-only prompt, for
-    # any example where the first attempt didn't yield a parseable
-    # Yes/No. This recovers cases where the judge model ignored the
-    # output-format instructions and rambled/echoed instead of
-    # answering.
-    # -------------------------------------------------
+
 
     failed_indices = [
         i for i, verdict in enumerate(all_parsed)
@@ -815,9 +746,8 @@ def summarize_yes_no(parsed_verdicts, label):
     return scores, percent, num_unparsed
 
 
-# ---------------------------------------------------------------------
 # Main
-# ---------------------------------------------------------------------
+
 
 def main():
 
@@ -834,9 +764,7 @@ def main():
 
     print(f"Using device: {device}")
 
-    # -------------------------------------------------
     # Load dataset
-    # -------------------------------------------------
 
     examples = load_truthfulqa_generation_examples(args.dataset_path)
 
@@ -844,9 +772,7 @@ def main():
         examples = examples[: args.max_examples]
         print(f"Limited evaluation to {args.max_examples} examples")
 
-    # -------------------------------------------------
     # Load generation model and generate candidate answers
-    # -------------------------------------------------
 
     gen_tokenizer, gen_model = load_generation_model(
         args.generation_model, device,
@@ -863,10 +789,7 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
-    # -------------------------------------------------
-    # Load judge model (FlowJudge) once, run all three judgement
-    # passes
-    # -------------------------------------------------
+    # Load judge model 
 
     judge_tokenizer, judge_model = load_judge_model(
         args.judge_model, device,
@@ -896,9 +819,8 @@ def main():
     if torch.cuda.is_available():
         torch.cuda.empty_cache()
 
-    # -------------------------------------------------
     # Summarize
-    # -------------------------------------------------
+
 
     truthful_scores, truthful_percent, truthful_unparsed = summarize_yes_no(
         truthful_verdicts, "Truthful"
@@ -931,9 +853,7 @@ def main():
         f"{truthful_and_informative_percent:.2f}%"
     )
 
-    # -------------------------------------------------
     # Save results
-    # -------------------------------------------------
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
