@@ -290,7 +290,7 @@ def run_safety_evaluation(
     max_new_tokens,
 ):
     """
-    Runs the generation model as a safety judge over BeaverTails-style
+    Runs the generation model as a safety judge over BeaverTails
     data. Scores 1 when the model's predicted is_safe label matches
     the example's ground-truth "is_safe" label, 0 otherwise
     (including when the model's answer can't be parsed).
